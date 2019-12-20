@@ -1,0 +1,7 @@
+slackclient>=2.3.1
+requests>=2.22
+tweepy>=3.5.0
+flask>=0.12.4
+oauth2>=1.9.0
+boto3>=1.10.26
+dictor>=0.1.3

@@ -1,3 +1,4 @@
+[![Requirements Status](https://requires.io/github/maxim-mityutko/slack-bot/requirements.svg?branch=master)](https://requires.io/github/maxim-mityutko/slack-bot/requirements/?branch=master)
 # Slack Scalable Bot
 
 This is a basic implementation of Slack bot <<description>>

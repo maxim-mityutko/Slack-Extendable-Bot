@@ -80,11 +80,10 @@ class UserServiceAuthState(object):
         params = {
             'Table': '_oauth_wrapper_state',
             'Key': {'user': self.user, 'service': self.service},
-            'UpdateExpression': 'set #st = :st, #sv = :sv, #t = :t',
-            'ExpressionAttributeNames': {'#st': 'state', '#sv': 'service', '#t': 'token'},
+            'UpdateExpression': 'set #st = :st, #t = :t',
+            'ExpressionAttributeNames': {'#st': 'state', '#t': 'token'},
             'ExpressionAttributeValues': {
                 ':st': b64encode(pickle.dumps(self.oaw)),
-                ':sv': self.oaw.connector_name,
                 ':t': self.oaw.oauth_token,
             }
         }

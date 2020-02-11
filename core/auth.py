@@ -22,7 +22,7 @@ def start_auth(connector: dict, user: str):
         authorize_url=connector['endpoints']['authorize'],
         access_token_url=connector['endpoints']['access_token'],
         user_agent=env['USER_AGENT'],
-        callback_uri='{url}/service-callback'.format(url=env['CALLBACK_URI']),
+        callback_uri='{url}/{service}-callback'.format(url=env['CALLBACK_URI'], service=connector['service']),
         connector_name=connector['service'],
     )
     url = oaw.get_authorization_url()
@@ -31,7 +31,7 @@ def start_auth(connector: dict, user: str):
 
 
 def save_oauthwrapper(oaw: OAuthWrapper, user: str):
-    state = UserServiceAuthState(user=user)
+    state = UserServiceAuthState(user=user, service=oaw.connector_name)
     state.oaw = oaw
     return state.set_oaw()
 

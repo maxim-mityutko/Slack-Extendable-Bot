@@ -1,15 +1,33 @@
 [![Requirements Status](https://requires.io/github/maxim-mityutko/slack-bot/requirements.svg?branch=master)](https://requires.io/github/maxim-mityutko/slack-bot/requirements/?branch=master)
 # Slack Scalable Bot
 
-This is a basic implementation of Slack bot <<description>>
+The goal of this project is to create a flexible bot for Slack that can be integrated with various services via the API.
+Extensibility of the solution is achieved by meta data driven plugins of two types: __connector__ and __payload__.
+
+__Connector__ file has all the required data to pass the OAuth2 authentication (both 2-leg or 3-leg is supported) through
+the OAuth wrapper class. Also the connectivity options can be increased by importing 3rd party modules that provide
+custom authentication wrappers for the required service. One connector can be used by multiple payloads that provide
+various functionality.
+
+
+__Payload__ file specifies the service API interaction steps, which in the simplest scenario  just calling the specific
+API and retrieving the value, but can also be extended with custom functions. The response of the payload scenario is
+wrapped in a JSON compatible with Slack API. 
+
+Bot itself is headless but to facilitate the authentication process the simple Flask app is implemented. Both can and 
+should be deployed in a separate containers.  
+
+# Project Structure
 
 ## ToDo
-* Add logic to suggest release or tweet over interval of time
-* Do something with tokens saved in Dockerfile
-* Async execution in main module
+* Async execution
+* Teraform script for AWS
 
-
+# Setup
 ## Docker
+Update __secrets.env__ before building the containers. 
+
+The easiest and fastest approach is to use _docker-compose_.
 * Docker compose:
 ```bash
 # Build container and start
@@ -22,19 +40,19 @@ docker-compose stop
 # Check if Docker is installed
 docker version
 # Remove existing container
-docker rm slack-bot
+docker rm <<container>>
 # Build
-docker build --tag slack-bot .
+docker build --tag <<tag>> .
 # Run
 # -d    start as daemon
-docker run --name slack-bot slack-bot
+docker run --name <<name>> <<container>>
 or to expose Flask
-docker run --name slack-bot -p 65010:65010 slack-bot
+docker run --name <<name>> -p 65010:65010 <<container>>
 ```
 
 ```bash
 # Execute command in container
-docker exec -it slack-discogs-bot /bin/sh
+docker exec -it <<name>> /bin/sh
 # View container logs
 docker logs <<container>>
 # Start container
@@ -47,8 +65,7 @@ docker inspect <<container>> | grep Address
 
 ## Development
 
-Only AWS specific environment variables should be setup in development 
-environment and server side:
+AWS specific environment variables should be setup in development environment:
 * AWS_REGION_NAME
 * AWS_ACCESS_KEY_ID
 * AWS_SECRET_ACCESS_KEY
@@ -72,6 +89,8 @@ Generate token - [Slack Apps](https://api.slack.com/apps)
 ### Services
 * <<SERVICE_NAME>>_CLIENT_ID
 * <<SERVICE_NAME>>_CLIENT_SECRET\
+
+### Currently Available
 [Discogs](https://www.discogs.com/settings/developers)\
 [Twitter](https://developer.twitter.com/en/apps)\
 [Mixcloud](https://www.mixcloud.com/developers/)

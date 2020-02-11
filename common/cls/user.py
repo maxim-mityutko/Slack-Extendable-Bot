@@ -58,17 +58,17 @@ class UserServiceConfig(object):
         )
 
 
-# TODO: 2leg auth state saving workaround - fix properly
 class UserServiceAuthState(object):
-    def __init__(self, user: str):
+    def __init__(self, user: str, service: str):
         self.user = user
+        self.service = service
         self.oaw = None
 
-    def get_oaw(self, token: str):
+    def get_oaw(self):
         resource = aws.resource('dynamodb')
         params = {
             'Table': '_oauth_wrapper_state',
-            'Key': {'user': self.user, 'token': token if token is not None else '2leg'}
+            'Key': {'user': self.user, 'service': self.service}
         }
         response = aws.dynamodb_get_item(resource, params)
         self.oaw = pickle.loads(b64decode(response['state'].value))
@@ -79,10 +79,14 @@ class UserServiceAuthState(object):
         res = aws.resource('dynamodb')
         params = {
             'Table': '_oauth_wrapper_state',
-            'Key': {'user': self.user, 'token': self.oaw.oauth_token if self.oaw.oauth_token is not None else '2leg'},
-            'UpdateExpression': 'set #st = :st, #sv = :sv',
-            'ExpressionAttributeNames': {'#st': 'state', '#sv': 'service'},
-            'ExpressionAttributeValues': {':st': b64encode(pickle.dumps(self.oaw)), ':sv': self.oaw.connector_name}
+            'Key': {'user': self.user, 'service': self.service},
+            'UpdateExpression': 'set #st = :st, #sv = :sv, #t = :t',
+            'ExpressionAttributeNames': {'#st': 'state', '#sv': 'service', '#t': 'token'},
+            'ExpressionAttributeValues': {
+                ':st': b64encode(pickle.dumps(self.oaw)),
+                ':sv': self.oaw.connector_name,
+                ':t': self.oaw.oauth_token,
+            }
         }
         aws.dynamodb_update_item(
             resource=res,
@@ -95,7 +99,7 @@ class UserServiceAuthState(object):
         res = aws.resource('dynamodb')
         params = {
             'Table': '_oauth_wrapper_state',
-            'Key': {'user': self.user, 'token': self.oaw.oauth_token if self.oaw.oauth_token is not None else '2leg'},
+            'Key': {'user': self.user, 'service': self.service},
         }
         aws.dynamodb_delete_item(
             resource=res,

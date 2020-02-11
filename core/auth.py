@@ -36,17 +36,18 @@ def save_oauthwrapper(oaw: OAuthWrapper, user: str):
     return state.set_oaw()
 
 
-def restore_oauthwrapper(oauth_token: str, user: str) -> OAuthWrapper:
-    state = UserServiceAuthState(user=user)
-    state.get_oaw(oauth_token)
+def restore_oauthwrapper(user: str, service: str) -> OAuthWrapper:
+    state = UserServiceAuthState(user=user, service=service)
+    state.get_oaw()
     oaw = state.oaw
     state.del_oaw()  # After OAuthWrapper object has been restored, there is no need to keep it in database.
     return oaw
 
 
-def finish_auth(oauth_token: str, verifier: str, code: str, user: str):
-    oaw = restore_oauthwrapper(oauth_token=oauth_token, user=user)
+def finish_auth(oauth_token: str, verifier: str, code: str, user: str, service: str):
+    oaw = restore_oauthwrapper(user=user, service=service)
     oaw.oauth_verifier = verifier if verifier is not None else code
+    oaw.oauth_token = oauth_token
     if oaw.get_access_token():
         conf = UserServiceConfig(service=oaw.connector_name, user=user)
         conf.oauth_token = oaw.oauth_token

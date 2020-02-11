@@ -28,8 +28,8 @@ def homepage():
     return page
 
 
-@app.route('/service-callback')
-def auth_callback():
+@app.route('/<service>-callback')
+def auth_callback(service: str):
     error = request.args.get('error', '')
     if error:
         return "Error: " + error
@@ -39,7 +39,7 @@ def auth_callback():
     verifier = request.args.get('oauth_verifier')
     token = request.args.get('oauth_token')
     code = request.args.get('code')
-    if auth.finish_auth(oauth_token=token, verifier=verifier, code=code, user=session['user']):
+    if auth.finish_auth(oauth_token=token, verifier=verifier, code=code, user=session['user'], service=service):
         return redirect('/')
     else:
         return 'Authentication error, please try again later!'
@@ -91,7 +91,6 @@ def build_url_list():
 
 
 if __name__ == '__main__':
-    # TODO: do i need to check user + token combination?
     environment.configure()
     app.secret_key = env['FLASK_SECRET_KEY']
     app.run(debug=False, port=65010, host='0.0.0.0')

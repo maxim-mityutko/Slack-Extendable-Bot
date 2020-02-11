@@ -2,29 +2,27 @@
 # Slack Scalable Bot
 
 The goal of this project is to create a flexible bot for Slack that can be integrated with various services via the API.
-Extensibility of the solution is achieved by meta data driven plugins of two types: __connector__ and __payload__.
+Extensibility of the solution is achieved by metadata driven plugins of two types: __connector__ and __payload__.
 
 __Connector__ file has all the required data to pass the OAuth2 authentication (both 2-leg or 3-leg is supported) through
-the OAuth wrapper class. Also the connectivity options can be increased by importing 3rd party modules that provide
-custom authentication wrappers for the required service. One connector can be used by multiple payloads that provide
-various functionality.
+the OAuth wrapper class. The connectivity options can be added by also importing 3rd party modules that provide
+custom authentication wrappers for the required services. One connector can be used by multiple payloads.
 
-
-__Payload__ file specifies the service API interaction steps, which in the simplest scenario  just calling the specific
+__Payload__ file specifies the service API interaction steps, which in the simplest scenario just calling the specific
 API and retrieving the value, but can also be extended with custom functions. The response of the payload scenario is
 wrapped in a JSON compatible with Slack API. 
 
 Bot itself is headless but to facilitate the authentication process the simple Flask app is implemented. Both can and 
 should be deployed in a separate containers.  
 
-# Project Structure
+##Project Structure
 
 ## ToDo
-* Async execution
-* Teraform script for AWS
+*  Async execution
+*  Teraform script for AWS
 
-# Setup
-## Docker
+## Setup
+### Docker
 Update __secrets.env__ before building the containers. 
 
 The easiest and fastest approach is to use _docker-compose_.
@@ -63,7 +61,7 @@ docker stop <container>
 docker inspect <<container>> | grep Address
 ```
 
-## Development
+### Development
 
 AWS specific environment variables should be setup in development environment:
 * AWS_REGION_NAME
@@ -77,20 +75,20 @@ sudo -H gedit /etc/environment
 
 Everything else is pulled from DynamoDb.
 
-## Tokens
+### Tokens
 
-### Bot
+#### Bot
 Generate token - [Slack Apps](https://api.slack.com/apps)
-* SLACK_BOT_TOKEN
-* SLACK_CLIENT_ID
-* SLACK_CLIENT_SECRET
-* SLACK_OAUTH_ACCESS_URL
+*  SLACK_BOT_TOKEN
+*  SLACK_CLIENT_ID
+*  SLACK_CLIENT_SECRET
+*  SLACK_OAUTH_ACCESS_URL
 
-### Services
-* <<SERVICE_NAME>>_CLIENT_ID
-* <<SERVICE_NAME>>_CLIENT_SECRET\
+#### Services
+*  <<SERVICE_NAME>>_CLIENT_ID
+*  <<SERVICE_NAME>>_CLIENT_SECRET\
 
-### Currently Available
+#### Currently Available
 [Discogs](https://www.discogs.com/settings/developers)\
 [Twitter](https://developer.twitter.com/en/apps)\
 [Mixcloud](https://www.mixcloud.com/developers/)
@@ -117,5 +115,6 @@ balena push <<aplication_name>>
 [Slack API Home](https://api.slack.com/)
 
 [Slack API - Python](https://python-slackclient.readthedocs.io/en/latest/index.html)
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

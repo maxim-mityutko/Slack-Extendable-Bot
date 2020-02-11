@@ -29,9 +29,7 @@ def send_message(web_client: slack.WebClient, channel: str, payload: list, **kwa
 @slack.RTMClient.run_on(event='message')
 def on_message(**kwargs):
     wc = kwargs['web_client']
-    bot_id = wc.api_call("aAWS_REGION_NAME=eu-central-1
-AWS_ACCESS_KEY_ID=<key_id>
-AWS_SECRET_ACCESS_KEY=<secret>uth.test")["user_id"]
+    bot_id = wc.api_call("auth.test")["user_id"]
     channel = kwargs['data']['channel']
     if 'subtype' not in kwargs['data'] and bot_id in kwargs['data']['text']:
         # Check if user sent a valid command.

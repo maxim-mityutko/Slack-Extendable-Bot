@@ -2,6 +2,7 @@ from flask import Flask
 from flask import request, session, redirect
 import requests
 import random
+import json
 from os import environ as env
 
 import sys
@@ -57,16 +58,20 @@ def callback():
             }
         )
         error = request.args.get('error', '')
+
         if error:
             return "Error: " + error
-        # TODO: error handling, when status is 200
         elif int(response.status_code) == 200:
-            user = auth.set_user_identity(response.content)
-            session['user'] = user.user
-            session['team'] = user.team
-            session['user_name'] = user.name
-            session['access_token'] = user.access_token
-            return redirect('/')
+            content = json.loads(response.content)
+            if content.get('ok') is False:
+                return 'Slack authentication error: {}'.format(content.get('error'))
+            else:
+                user = auth.set_user_identity(response.content)
+                session['user'] = user.user
+                session['team'] = user.team
+                session['user_name'] = user.name
+                session['access_token'] = user.access_token
+                return redirect('/')
         else:
             return 'Authentication error, please try again later!'
     else:

@@ -16,6 +16,7 @@ Bot itself is headless but to facilitate the authentication process the simple F
 should be deployed in a separate containers.  
 
 ##Project Structure
+```
     .
     ├── aws                 # AWS Cloudformation stack templates
     ├── bot                 # Bot files
@@ -27,7 +28,7 @@ should be deployed in a separate containers.
         ├── payload         # Available payload definitions
     ├── web                 # Web server files
     └── README.md
-
+```
 
 ## ToDo
 *  Async execution

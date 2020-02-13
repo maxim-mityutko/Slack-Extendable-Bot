@@ -1,0 +1,140 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'Slack Bot AWS stack: IAM (group with inline policy, user, access key), DynamoDb tables
+              and prepopulated default values.'
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+      - Label:
+          default: 'User Parameters'
+        Parameters:
+          - UserName
+########################################################################################################################
+# Parameters #
+########################################################################################################################
+Parameters:
+  UserName:
+    Description: 'Create AWS user with the specified name to bind the access key and provide access to DynamoDb.'
+    Type: String
+    Default: slack-bot
+Resources:
+########################################################################################################################
+# IAM #
+########################################################################################################################
+  IAMDynamoDbPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: DynamoDb-ReadWrite-Policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'dynamodb:BatchGetItem'
+              - 'dynamodb:BatchWriteItem'
+              - 'dynamodb:ConditionCheckItem'
+              - 'dynamodb:PutItem'
+              - 'dynamodb:ListTables'
+              - 'dynamodb:DescribeTable'
+              - 'dynamodb:DeleteItem'
+              - 'dynamodb:GetItem'
+              - 'dynamodb:Scan'
+              - 'dynamodb:Query'
+              - 'dynamodb:UpdateItem'
+            Resource: '*'
+      Groups:
+        - !Ref IAMDynamoDBGroup
+  IAMDynamoDBGroup:
+    Type: 'AWS::IAM::Group'
+    Properties:
+      GroupName: DynamoDb-Users
+  IAMBotUser:
+    Type: 'AWS::IAM::User'
+    Properties:
+      UserName: !Ref UserName
+      Groups:
+        - !Ref IAMDynamoDBGroup
+    DependsOn:
+      - IAMDynamoDBGroup
+  IAMBotAccessKey:
+    Type: 'AWS::IAM::AccessKey'
+    Properties:
+      Status: Active
+      UserName: !Ref UserName
+    DependsOn:
+      - IAMBotUser
+########################################################################################################################
+# DynamoDB #
+########################################################################################################################
+  DDBOauthWrapperState:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: _oauth_wrapper_state
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: user
+          AttributeType: S
+        - AttributeName: service
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user
+          KeyType: HASH
+        - AttributeName: service
+          KeyType: RANGE
+  DDBConfig:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: config
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: parameter
+          AttributeType: S
+      KeySchema:
+        - AttributeName: parameter
+          KeyType: HASH
+  DDBService:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: service
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: name
+          AttributeType: S
+      KeySchema:
+        - AttributeName: name
+          KeyType: HASH
+  DDBUser:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: user
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: user
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user
+          KeyType: HASH
+  DDBUserService:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: user_service
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: user
+          AttributeType: S
+        - AttributeName: service
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user
+          KeyType: HASH
+        - AttributeName: service
+          KeyType: RANGE
+########################################################################################################################
+# Outputs #
+########################################################################################################################
+Outputs:
+  AccessKey:
+    Value: !Ref IAMBotAccessKey
+    Description: 'AWS Access Key ID for new user.'
+  SecretKey:
+    Value: !GetAtt [IAMBotAccessKey, SecretAccessKey]
+    Description: 'AWS Secret Key for new user.'

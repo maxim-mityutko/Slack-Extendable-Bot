@@ -16,10 +16,22 @@ Bot itself is headless but to facilitate the authentication process the simple F
 should be deployed in a separate containers.  
 
 ##Project Structure
+    .
+    ├── aws                 # AWS Cloudformation stack templates
+    ├── bot                 # Bot files
+    ├── common              # Common modules used across the project
+        ├── cls             # Classes used across the project
+    ├── core                # Modules that facilitate bot and web server functionality
+    ├── service             # Root for connectors and payloads
+        ├── connector       # Available connector definitions
+        ├── payload         # Available payload definitions
+    ├── web                 # Web server files
+    └── README.md
+
 
 ## ToDo
 *  Async execution
-*  Teraform script for AWS
+*  AWS - deploy config as part of Cloudformation stack
 
 ## Setup
 ### Docker

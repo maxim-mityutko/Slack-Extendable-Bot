@@ -15,17 +15,17 @@ wrapped in a JSON compatible with Slack API.
 Bot itself is headless but to facilitate the authentication process the simple Flask app is implemented. Both can and 
 should be deployed in a separate containers.  
 
-##Project Structure
+## Project Structure
 ```
     .
     ├── aws                 # AWS Cloudformation stack templates
     ├── bot                 # Bot files
     ├── common              # Common modules used across the project
-        ├── cls             # Classes used across the project
+    │   ├── cls             # Classes used across the project
     ├── core                # Modules that facilitate bot and web server functionality
     ├── service             # Root for connectors and payloads
-        ├── connector       # Available connector definitions
-        ├── payload         # Available payload definitions
+    │   ├── connector       # Available connector definitions
+    │   └── payload         # Available payload definitions
     ├── web                 # Web server files
     └── README.md
 ```

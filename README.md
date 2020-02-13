@@ -1,5 +1,5 @@
 [![Requirements Status](https://requires.io/github/maxim-mityutko/slack-bot/requirements.svg?branch=master)](https://requires.io/github/maxim-mityutko/slack-bot/requirements/?branch=master)
-# Slack Scalable Bot
+# Slack Extendable Bot (S.E.B)
 
 The goal of this project is to create a flexible bot for Slack that can be integrated with various services via the API.
 Extensibility of the solution is achieved by metadata driven plugins of two types: __connector__ and __payload__.

@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'Slack Extendable Bot (S.E.B.)
+              NOTE: Deploy after ''seb-infra.yml''
+              Insert default configuration to the ''config'' table of DynamoDb and an example
+              record in the ''service'' table just to illustrate how service authentication data should be structured.
+              Stack can be safely removed after the deployment.'
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: SEBRole-Deploy-DynamoDb-Lamda
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: SEBPolicy-Deploy-DynamoDb-Lamda
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: "*"
+  LamdaPutData:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: SEB-DynamoDb-DeployDefaults
+      Description: 'Deploy default values into "config" table and example into "service"'
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+
+          def put(table, items):
+              for item in items:
+                  table.put_item(Item=item)
+
+          def handler(event, context):
+              dynamo = boto3.resource('dynamodb')
+              table = dynamo.Table('config')
+              try:
+                  items = [
+                      {'parameter': 'CALLBACK_URI', 'type': 'environment', 'value': 'http://localhost:65010'},
+                      {'parameter': 'USER_AGENT', 'type': 'environment', 'value': 'seb-v1'},
+                      {'parameter': 'DEFAULT_FRIENDLY_NAME', 'type': 'environment', 'value': 'Default Name'},
+                      {'parameter': 'DEFAULT_ICON_EMOJI', 'type': 'environment', 'value': ':zany_face:'},
+                      {'parameter': 'DEFAULT_SLACK_CHANNEL', 'type': 'environment', 'value': '#test'},
+                      {'parameter': 'FLASK_SECRET_KEY', 'type': 'environment', 'value': '<random_key>'},
+                      {'parameter': 'SLACK_BOT_TOKEN', 'type': 'environment', 'value': '<token>'},
+                      {'parameter': 'SLACK_CLIENT_ID', 'type': 'environment', 'value': '<client_id>'},
+                      {'parameter': 'SLACK_CLIENT_SECRET', 'type': 'environment', 'value': '<client_secret>'},
+                      {'parameter': 'SLACK_OAUTH_ACCESS_URL', 'type': 'environment', 'value': 'https://slack.com/api/oauth.access'},
+                      {'parameter': 'USER_AGENT', 'type': 'environment', 'value': 'seb-v1'},
+                  ]
+                  put(table, items)
+
+                  table = dynamo.Table('service')
+                  items = [
+                      {'name': 'test', 'oauth': {'client_id': '<client_id>', 'client_secret': '<client_secret>'}}
+                  ]
+                  put(table, items)
+                  responseData = {'status': 'OK'}
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+              except Exception as ex:
+                  print(ex)
+                  responseData = {'status': 'FAILED', 'error': ex}
+                  cfnresponse.send(event, context, cfnresponse.FAILED, responseData)
+
+      Handler: index.handler
+      Role:
+        Fn::GetAtt: [ LambdaRole , 'Arn' ]
+      Runtime: python3.7
+      Timeout: 60
+  Init:
+    Type: Custom::Init
+    Properties:
+      ServiceToken:
+        Fn::GetAtt: [ LamdaPutData , 'Arn' ]

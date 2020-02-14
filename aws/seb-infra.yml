@@ -44,20 +44,12 @@ Resources:
               - 'dynamodb:Query'
               - 'dynamodb:UpdateItem'
             Resource: '*'
-      Groups:
-        - !Ref IAMDynamoDBGroup
-  IAMDynamoDBGroup:
-    Type: 'AWS::IAM::Group'
-    Properties:
-      GroupName: SEB-DynamoDb-Users
+      Users:
+        - !Ref IAMBotUser
   IAMBotUser:
     Type: 'AWS::IAM::User'
     Properties:
       UserName: !Ref UserName
-      Groups:
-        - !Ref IAMDynamoDBGroup
-    DependsOn:
-      - IAMDynamoDBGroup
   IAMBotAccessKey:
     Type: 'AWS::IAM::AccessKey'
     Properties:

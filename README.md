@@ -34,19 +34,28 @@ should be deployed in a separate containers.
 *  Async execution
 *  AWS - deploy config as part of Cloudformation stack
 
-## Setup
-### Docker
-Update __secrets.env__ before building the containers. 
+## Deployment
+* Setup AWS stack with Cloudformation scripts provided in _/aws_ folder.
+* Spin up docker containers. The easiest and fastest approach is to use provided _docker-compose_. 
+  
+  NOTE: Update __secrets.env__ before building the containers, 'access key' and 'key secret' are available as the output
+  of Cloudformation stack.
+    ```bash
+    # Build container and start
+    docker-compose up
+    # Stop containers
+    docker-compose stop
+    ```
 
-The easiest and fastest approach is to use _docker-compose_.
-* Docker compose:
+### Balena Cloud
+Currently bot is running in Docker environment on Raspberry Pi v4 running BalenaOS. Their service handles deployment 
+and the build in the cloud and the code is pushed via the Balena CLI, for more information go to:
+[Balena CLI](https://github.com/balena-io/balena-cli/blob/master/INSTALL.md)
 ```bash
-# Build container and start
-docker-compose up
-# Stop containers
-docker-compose stop
-```
-* Individual container:
+balena push <<aplication_name>>
+```  
+### Docker
+Useful Docker commands:
 ```bash
 # Check if Docker is installed
 docker version
@@ -55,13 +64,11 @@ docker rm <<container>>
 # Build
 docker build --tag <<tag>> .
 # Run
-# -d    start as daemon
+# Add -d to start as daemon
 docker run --name <<name>> <<container>>
-or to expose Flask
+# or to expose Flask
 docker run --name <<name>> -p 65010:65010 <<container>>
-```
 
-```bash
 # Execute command in container
 docker exec -it <<name>> /bin/sh
 # View container logs
@@ -74,45 +81,39 @@ docker stop <container>
 docker inspect <<container>> | grep Address
 ```
 
-### Development
+## Development
 
 AWS specific environment variables should be setup in development environment:
 * AWS_REGION_NAME
 * AWS_ACCESS_KEY_ID
 * AWS_SECRET_ACCESS_KEY
 
-Add persistent environment variables on dev box:
+Add persistent environment variables on Ubuntu dev box:
 ```bash
 sudo -H gedit /etc/environment
 ```
-
 Everything else is pulled from DynamoDb.
 
-### Tokens
+## Tokens
+All tokens and secrets are stored in the DynamoDb tables: 'config' for Slack related settings, 'service' for connector
+settings. Upon startup they are retrieved from the cloud and pushed to environment variables with names specified below.
 
-#### Bot
+### Bot
 Generate token - [Slack Apps](https://api.slack.com/apps)
 *  SLACK_BOT_TOKEN
 *  SLACK_CLIENT_ID
 *  SLACK_CLIENT_SECRET
 *  SLACK_OAUTH_ACCESS_URL
 
-#### Services
+### Services
 *  <<SERVICE_NAME>>_CLIENT_ID
-*  <<SERVICE_NAME>>_CLIENT_SECRET\
+*  <<SERVICE_NAME>>_CLIENT_SECRET
 
 #### Currently Available
 [Discogs](https://www.discogs.com/settings/developers)\
 [Twitter](https://developer.twitter.com/en/apps)\
 [Mixcloud](https://www.mixcloud.com/developers/)
 
-## Balena Cloud
-Bot is running in Docker environment on Raspberry Pi v4.
-For quick and easy deployment BalenaOS is used on the device and BalenaCLI is required to deploy code to the cloud and build docker images:
-[Balena CLI](https://github.com/balena-io/balena-cli/blob/master/INSTALL.md)
-```bash
-balena push <<aplication_name>>
-```
 
 ## Useful links
 [Discogs API Client](https://github.com/discogs/discogs_client)

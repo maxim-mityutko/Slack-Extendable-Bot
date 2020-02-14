@@ -21,7 +21,7 @@ should be deployed in a separate containers.
     ├── aws                 # AWS Cloudformation stack templates
     ├── bot                 # Bot files
     ├── common              # Common modules used across the project
-    │   ├── cls             # Classes used across the project
+    │   └── cls             # Classes used across the project
     ├── core                # Modules that facilitate bot and web server functionality
     ├── service             # Root for connectors and payloads
     │   ├── connector       # Available connector definitions
@@ -32,7 +32,6 @@ should be deployed in a separate containers.
 
 ## ToDo
 *  Async execution
-*  AWS - deploy config as part of Cloudformation stack
 
 ## Deployment
 * Setup AWS stack with Cloudformation scripts provided in _/aws_ folder.
@@ -52,7 +51,7 @@ Currently bot is running in Docker environment on Raspberry Pi v4 running Balena
 and the build in the cloud and the code is pushed via the Balena CLI, for more information go to:
 [Balena CLI](https://github.com/balena-io/balena-cli/blob/master/INSTALL.md)
 ```bash
-balena push <<aplication_name>>
+balena push <aplication_name>
 ```  
 ### Docker
 Useful Docker commands:
@@ -60,25 +59,25 @@ Useful Docker commands:
 # Check if Docker is installed
 docker version
 # Remove existing container
-docker rm <<container>>
+docker rm <container>
 # Build
-docker build --tag <<tag>> .
+docker build --tag <tag> .
 # Run
 # Add -d to start as daemon
-docker run --name <<name>> <<container>>
+docker run --name <name> <container>
 # or to expose Flask
-docker run --name <<name>> -p 65010:65010 <<container>>
+docker run --name <name> -p 65010:65010 <container>
 
 # Execute command in container
-docker exec -it <<name>> /bin/sh
+docker exec -it <name> /bin/sh
 # View container logs
-docker logs <<container>>
+docker logs <container>
 # Start container
 docker start <container>
 # Stop container
 docker stop <container>
 # View internal container IP address
-docker inspect <<container>> | grep Address
+docker inspect <container> | grep Address
 ```
 
 ## Development
